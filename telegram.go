@@ -32,7 +32,7 @@ func (a *adminBot) SendDocument(filePath, text string) {
 	msg := tgbotapi.NewDocumentUpload(a.chatID, filePath)
 	msg.Caption = text
 	if _, err := a.bot.Send(msg); err != nil {
-		ErrorLogger.Println("NewDocumentUpload", err)
+		ErrorLogger.Println("NewDocumentUpload", err, text)
 	}
 }
 
@@ -64,6 +64,9 @@ func (a *adminBot) SendError(data interface{}, txt string) {
 		} else if err := a.writeFile(path, body); err != nil {
 			ErrorLogger.Println("write error", err)
 		} else {
+			if len(txt) > 1000 {
+				txt = txt[:1000]
+			}
 			a.SendDocument(path, txt)
 		}
 	}
