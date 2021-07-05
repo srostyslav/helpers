@@ -55,23 +55,20 @@ func (r *Request) send() (err error) {
 	}
 }
 
-func (r *Request) Post() error {
+func (r *Request) Post() (err error) {
 	r.init()
 
-	var (
-		body *bytes.Reader
-		err  error
-	)
 	if r.Body != nil {
 		if output, err := json.Marshal(&r.Body); err != nil {
 			return err
-		} else {
-			body = bytes.NewReader(output)
+		} else if r.req, err = http.NewRequest(http.MethodPost, r.Url, bytes.NewReader(output)); err != nil {
+			return err
 		}
-	}
-	if r.req, err = http.NewRequest(http.MethodPost, r.Url, body); err != nil {
+	} else if r.req, err = http.NewRequest(http.MethodPost, r.Url, nil); err != nil {
 		return err
 	}
+
+	r.setQueryParams()
 
 	return r.send()
 }
