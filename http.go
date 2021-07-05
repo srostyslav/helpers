@@ -29,6 +29,10 @@ func (r *Request) init() {
 	}
 }
 
+func (r *Request) SetClient(c *http.Client) {
+	r.client = c
+}
+
 func (r *Request) send() (err error) {
 	if r.Json {
 		r.req.Header.Add("content-type", "application/json")
@@ -54,9 +58,18 @@ func (r *Request) send() (err error) {
 func (r *Request) Post() error {
 	r.init()
 
-	if output, err := json.Marshal(&r.Body); err != nil {
-		return err
-	} else if r.req, err = http.NewRequest(http.MethodPost, r.Url, bytes.NewReader(output)); err != nil {
+	var (
+		body *bytes.Reader
+		err  error
+	)
+	if r.Body != nil {
+		if output, err := json.Marshal(&r.Body); err != nil {
+			return err
+		} else {
+			body = bytes.NewReader(output)
+		}
+	}
+	if r.req, err = http.NewRequest(http.MethodPost, r.Url, body); err != nil {
 		return err
 	}
 
