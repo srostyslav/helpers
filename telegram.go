@@ -30,7 +30,7 @@ func (a *adminBot) SendDocument(filePath, text string) {
 	}
 
 	msg := tgbotapi.NewDocumentUpload(a.chatID, filePath)
-	msg.Caption = text
+	msg.Caption = a.projectName + " " + text
 	if _, err := a.bot.Send(msg); err != nil {
 		ErrorLogger.Println("NewDocumentUpload", err, text)
 	}
